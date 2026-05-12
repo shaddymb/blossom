@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Blossom">
+<meta name="theme-color" content="#FBF7F2">
+<title>Blossom — Coach minceur</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --bg: #FBF7F2;
+  --surface: #FFFFFF;
+  --card: #FFFFFF;
+  --accent: #E8785A;
+  --accent2: #C4956A;
+  --soft: #F5EDE3;
+  --text: #1A1410;
+  --muted: #9A8A7A;
+  --border: #EDE0D4;
+  --green: #6B9E6E;
+  --light-green: #EEF5EE;
+  --blue: #4A90D9;
+  --purple: #8B6DB5;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-weight:300;
+  max-width:480px;margin:0 auto;
+  display:flex;flex-direction:column;
+  height:100%;height:100dvh;
+  position:fixed;width:100%;left:50%;transform:translateX(-50%);
+}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:none;}
+input,textarea{font-family:'DM Sans',sans-serif;}
+input::placeholder,textarea::placeholder{color:#BBA898;}
+::-webkit-scrollbar{display:none;}
+
+#app{display:flex;flex-direction:column;height:100%;}
+#header{background:var(--bg);padding:16px 20px 0;border-bottom:1px solid var(--border);flex-shrink:0;}
+.header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.app-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.app-logo span{color:var(--accent);}
+.date-badge{font-size:11px;color:var(--muted);background:var(--soft);padding:4px 10px;border-radius:20px;}
+
+.tabs{display:flex;}
+.tab-btn{flex:1;padding:10px 4px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all 0.2s;}
+.tab-btn i{font-size:18px;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+#content{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+#bottom-nav{display:flex;background:var(--surface);border-top:1px solid var(--border);padding:8px 0 calc(8px + env(safe-area-inset-bottom));flex-shrink:0;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:10px;font-weight:600;padding:4px;transition:color 0.2s;}
+.nav-btn i{font-size:22px;}
+.nav-btn.active{color:var(--accent);}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;}
+.card+.card{margin-top:12px;}
+
+.goal-card{background:var(--accent);border-radius:16px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.goal-card::before{content:'';position:absolute;right:-20px;top:-20px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.08);}
+.goal-label{font-size:11px;color:rgba(255,255,255,0.75);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.goal-row{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;}
+.goal-current{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:#fff;line-height:1;}
+.goal-unit{font-size:14px;color:rgba(255,255,255,0.8);}
+.goal-sep{font-size:20px;color:rgba(255,255,255,0.4);margin:0 4px;}
+.goal-target{font-size:26px;font-weight:600;color:rgba(255,255,255,0.85);}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:6px;}
+.prog-bar{height:6px;background:rgba(255,255,255,0.2);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:#fff;border-radius:3px;}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:8px;}
+.stat-label{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.stat-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px;}
+.section-title{font-size:15px;font-weight:600;}
+.section-action{font-size:12px;color:var(--accent);font-weight:500;}
+
+.meal-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;}
+.meal-dot-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.meal-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;}
+.meal-dot.done{background:var(--green);}
+.meal-dot.pending{background:transparent;border:2px solid var(--accent);}
+.dot-line{width:1px;flex:1;background:var(--border);min-height:24px;margin:4px 0;}
+.meal-card-inner{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.meal-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.meal-name{font-size:13px;font-weight:600;}
+.meal-kcal{font-size:12px;font-weight:600;color:var(--accent);}
+.meal-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
+
+.workout-item{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
+.workout-item.active-wo{border-color:var(--accent);background:rgba(232,120,90,0.03);}
+.wo-icon{width:44px;height:44px;border-radius:10px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.wo-body{flex:1;}
+.wo-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.wo-meta{font-size:11px;color:var(--muted);}
+.wo-right{text-align:right;flex-shrink:0;}
+.wo-kcal{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--accent);}
+.wo-kcal-lbl{font-size:10px;color:var(--muted);}
+
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;}
+.badge-orange{background:rgba(232,120,90,0.1);color:#712B13;}
+
+.hydro-row{display:flex;gap:6px;flex-wrap:wrap;}
+.water-glass{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--soft);border:1px solid var(--border);cursor:pointer;transition:all 0.2s;}
+.water-glass.filled{background:#EBF3FF;border-color:var(--blue);}
+
+.tip-card{background:var(--soft);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;gap:12px;}
+.tip-icon{font-size:22px;flex-shrink:0;}
+.tip-title{font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:3px;}
+.tip-text{font-size:12px;color:var(--muted);line-height:1.5;}
+
+.mini-chart{display:flex;align-items:flex-end;gap:5px;height:64px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.bar-rect{border-radius:4px 4px 0 0;width:100%;}
+.bar-day{font-size:9px;color:var(--muted);}
+
+.profile-hdr{display:flex;gap:14px;align-items:center;margin-bottom:20px;}
+.avatar{width:60px;height:60px;border-radius:50%;background:var(--soft);border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+.profile-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.goal-tag{display:inline-block;background:rgba(232,120,90,0.1);color:var(--accent);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid rgba(232,120,90,0.2);margin-top:4px;}
+.setting-row{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.setting-left{display:flex;gap:12px;align-items:center;}
+.setting-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.setting-name{font-size:13px;font-weight:500;}
+.setting-val{font-size:12px;color:var(--muted);}
+
+.btn-primary{width:100%;background:var(--accent);color:#fff;border-radius:14px;padding:16px;font-size:15px;font-weight:600;letter-spacing:0.3px;margin-top:10px;transition:opacity 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary:active{opacity:0.85;}
+.btn-outline{width:100%;background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:14px;padding:14px;font-size:14px;font-weight:600;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;}
+
+#tab-coach{display:none;flex-direction:column;flex:1;overflow:hidden;}
+#tab-coach.active{display:flex;}
+.coach-intro{padding:20px;flex-shrink:0;}
+.coach-avatar-row{display:flex;gap:12px;align-items:center;margin-bottom:16px;}
+.coach-avatar{width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.coach-name{font-size:15px;font-weight:600;}
+.coach-status{font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;}
+.coach-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+.chat-scroll{flex:1;overflow-y:auto;padding:0 20px 12px;-webkit-overflow-scrolling:touch;}
+.msg-row{display:flex;margin-bottom:12px;}
+.msg-row.user{justify-content:flex-end;}
+.msg-row.ai{justify-content:flex-start;}
+.msg-bubble{max-width:82%;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.55;}
+.msg-row.user .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.msg-row.ai .msg-bubble{background:var(--surface);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px;}
+
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:14px;}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:0.2s;}
+.typing-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+.quick-chips{display:flex;gap:8px;overflow-x:auto;padding:0 20px 12px;flex-shrink:0;}
+.chip{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:8px 14px;font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;flex-shrink:0;}
+.chip:active{background:var(--soft);border-color:var(--accent);color:var(--accent);}
+
+.chat-input-row{display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;align-items:flex-end;}
+.chat-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:10px 16px;font-size:14px;color:var(--text);resize:none;max-height:100px;line-height:1.4;outline:none;}
+.chat-input:focus{border-color:var(--accent);}
+.send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.send-btn:active{opacity:0.8;}
+.send-btn:disabled{background:var(--border);color:var(--muted);}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:flex-end;justify-content:center;z-index:200;}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:24px 24px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.weight-input-big{width:100%;text-align:center;font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:var(--accent);background:var(--soft);border:none;border-radius:14px;padding:16px;outline:none;}
+.modal-unit{text-align:center;font-size:13px;color:var(--muted);margin-top:8px;margin-bottom:20px;}
+
+/* OBJECTIFS MODAL */
+.obj-field{margin-bottom:16px;}
+.obj-label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;}
+.obj-input{width:100%;background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:15px;color:var(--text);outline:none;}
+.obj-input:focus{border-color:var(--accent);}
+.obj-row{display:flex;gap:10px;}
+.obj-row .obj-field{flex:1;}
+
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="header-row">
+      <div class="app-logo">blos<span>som</span></div>
+      <div class="date-badge" id="current-date"></div>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- HOME -->
+    <div class="tab-panel active" id="tab-home">
+      <div style="margin-bottom:18px;">
+        <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Bonjour</div>
+        <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;" id="home-name">Anissa 🌸</div>
+      </div>
+      <div class="goal-card" onclick="openWeightModal()">
+        <div class="goal-label">Objectif poids — touche pour mettre à jour</div>
+        <div class="goal-row">
+          <div class="goal-current" id="current-weight">72</div>
+          <div class="goal-unit">kg</div>
+          <div class="goal-sep">→</div>
+          <div class="goal-target" id="goal-target-display">60 kg</div>
+        </div>
+        <div class="prog-label">
+          <span id="lost-label">–4.6 kg perdus</span>
+          <span id="remaining-label">–12 kg restants</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:27%"></div></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#FFF0EB;"><i class="ti ti-flame" style="color:var(--accent)"></i></div>
+          <div class="stat-label">Calories</div>
+          <div class="stat-val" style="color:var(--accent);">1 240</div>
+          <div class="stat-sub" id="kcal-sub">/ 1 500 kcal</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#EBF3FF;"><i class="ti ti-droplet" style="color:var(--blue)"></i></div>
+          <div class="stat-label">Eau</div>
+          <div class="stat-val" style="color:var(--blue);">1.4 L</div>
+          <div class="stat-sub" id="water-sub">/ 2.0 L objectif</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#EEF5EE;"><i class="ti ti-run" style="color:var(--green)"></i></div>
+          <div class="stat-label">Pas</div>
+          <div class="stat-val" style="color:var(--green);">7 432</div>
+          <div class="stat-sub" id="steps-sub">/ 10 000</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#F3EEFF;"><i class="ti ti-moon" style="color:var(--purple)"></i></div>
+          <div class="stat-label">Sommeil</div>
+          <div class="stat-val" style="color:var(--purple);">7h20</div>
+          <div class="stat-sub" id="sleep-sub">/ 8h objectif</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="section-hdr" style="margin:0 0 10px;">
+          <div class="section-title">Évolution du poids</div>
+          <div style="font-size:12px;color:var(--green);font-weight:600;">–1.2 kg cette semaine</div>
+        </div>
+        <div class="mini-chart" id="weight-chart"></div>
+      </div>
+      <div class="section-hdr">
+        <div class="section-title">Hydratation</div>
+        <div class="section-action" id="hydro-count">5 / 8 verres</div>
+      </div>
+      <div class="hydro-row" id="hydro-dots"></div>
+      <div class="section-hdr" style="margin-top:16px;">
+        <div class="section-title">Sommeil</div>
+        <div class="section-action" id="sleep-display">7h20 cette nuit</div>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Coucher</div>
+            <input type="time" id="sleep-start" value="23:00" style="width:100%;background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:16px;color:var(--text);outline:none;" onchange="calcSleep()">
+          </div>
+          <div style="font-size:22px;color:var(--muted);margin-top:16px;">→</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Réveil</div>
+            <input type="time" id="sleep-end" value="06:20" style="width:100%;background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:16px;color:var(--text);outline:none;" onchange="calcSleep()">
+          </div>
+        </div>
+        <div style="margin-top:12px;background:var(--soft);border-radius:8px;height:8px;overflow:hidden;">
+          <div id="sleep-bar" style="height:100%;background:var(--purple);border-radius:8px;width:92%;transition:width 0.4s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--muted);">
+          <span>0h</span>
+          <span id="sleep-total-label" style="color:var(--purple);font-weight:600;">7h20</span>
+          <span id="sleep-goal-label">objectif 8h</span>
+        </div>
+      </div>
+
+      <div class="tip-card" style="margin-top:0;">
+        <div class="tip-icon">💡</div>
+        <div>
+          <div class="tip-title">Astuce du jour</div>
+          <div class="tip-text">Boire un grand verre d'eau avant chaque repas réduit l'appétit et t'aide à mieux contrôler tes portions.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPAS -->
+    <div class="tab-panel" id="tab-meals">
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Aujourd'hui</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Mes repas</div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+        <div class="stat-card" style="padding:10px;">
+          <div class="stat-label">Calories</div>
+          <div class="stat-val" style="color:var(--accent);font-size:19px;">1 240</div>
+          <div class="stat-sub">/ 1 500</div>
+        </div>
+        <div class="stat-card" style="padding:10px;">
+          <div class="stat-label">Protéines</div>
+          <div class="stat-val" style="color:var(--green);font-size:19px;">64g</div>
+          <div class="stat-sub">/ 90g</div>
+        </div>
+        <div class="stat-card" style="padding:10px;">
+          <div class="stat-label">Glucides</div>
+          <div class="stat-val" style="color:var(--accent2);font-size:19px;">120g</div>
+          <div class="stat-sub">/ 160g</div>
+        </div>
+      </div>
+      <div class="section-hdr">
+        <div class="section-title">Timeline</div>
+        <div class="section-action">+ Ajouter</div>
+      </div>
+      <div class="meal-item">
+        <div class="meal-dot-col"><div class="meal-dot done"></div><div class="dot-line"></div></div>
+        <div class="meal-card-inner">
+          <div class="meal-top">
+            <div><div class="meal-name">Petit-déjeuner · 08:00</div><div class="meal-desc">Yaourt grec, fruits rouges, granola</div></div>
+            <div style="text-align:right;"><div class="meal-kcal">320 kcal</div><i class="ti ti-check" style="color:var(--green);font-size:14px;"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="meal-item">
+        <div class="meal-dot-col"><div class="meal-dot done"></div><div class="dot-line"></div></div>
+        <div class="meal-card-inner">
+          <div class="meal-top">
+            <div><div class="meal-name">Déjeuner · 12:30</div><div class="meal-desc">Salade quinoa, avocat, poulet grillé</div></div>
+            <div style="text-align:right;"><div class="meal-kcal">520 kcal</div><i class="ti ti-check" style="color:var(--green);font-size:14px;"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="meal-item">
+        <div class="meal-dot-col"><div class="meal-dot done"></div><div class="dot-line"></div></div>
+        <div class="meal-card-inner">
+          <div class="meal-top">
+            <div><div class="meal-name">Collation · 15:30</div><div class="meal-desc">Pomme + 15g amandes</div></div>
+            <div style="text-align:right;"><div class="meal-kcal">180 kcal</div><i class="ti ti-check" style="color:var(--green);font-size:14px;"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="meal-item">
+        <div class="meal-dot-col"><div class="meal-dot pending"></div></div>
+        <div class="meal-card-inner">
+          <div class="meal-top">
+            <div><div class="meal-name">Dîner · 19:00</div><div class="meal-desc">Saumon, haricots verts, riz complet</div></div>
+            <div style="text-align:right;"><div class="meal-kcal" style="color:var(--muted);">~440 kcal</div><i class="ti ti-clock" style="color:var(--muted);font-size:14px;"></i></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="switchTab('coach')"><i class="ti ti-sparkles"></i> Demander un plan repas à l'IA</button>
+    </div>
+
+    <!-- SPORT -->
+    <div class="tab-panel" id="tab-sport">
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Programme semaine</div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;">Sport <span style="color:var(--accent)">& forme</span></div>
+      </div>
+      <div class="workout-item active-wo">
+        <div class="wo-icon">🏃‍♀️</div>
+        <div class="wo-body">
+          <div class="wo-name">Cardio — Aujourd'hui</div>
+          <div class="wo-meta">35 min · Intensité modérée</div>
+          <div style="margin-top:6px;"><span class="badge badge-orange"><i class="ti ti-flame" style="font-size:10px;"></i> En cours</span></div>
+        </div>
+        <div class="wo-right"><div class="wo-kcal">280</div><div class="wo-kcal-lbl">kcal</div></div>
+      </div>
+      <div class="section-hdr" style="margin-top:4px;">
+        <div class="section-title">Cette semaine</div>
+        <div style="font-size:12px;color:var(--green);font-weight:600;">3 / 5 faites</div>
+      </div>
+      <div class="workout-item">
+        <div class="wo-icon">🧘‍♀️</div>
+        <div class="wo-body"><div class="wo-name">Yoga flow</div><div class="wo-meta">Lundi · 40 min</div></div>
+        <div class="wo-right"><div class="wo-kcal" style="color:var(--green);font-size:20px;">✓</div><div class="wo-kcal-lbl">180 kcal</div></div>
+      </div>
+      <div class="workout-item">
+        <div class="wo-icon">💪</div>
+        <div class="wo-body"><div class="wo-name">Full body renfo</div><div class="wo-meta">Mardi · 45 min</div></div>
+        <div class="wo-right"><div class="wo-kcal" style="color:var(--green);font-size:20px;">✓</div><div class="wo-kcal-lbl">320 kcal</div></div>
+      </div>
+      <div class="workout-item">
+        <div class="wo-icon">🚴‍♀️</div>
+        <div class="wo-body"><div class="wo-name">Vélo HIIT</div><div class="wo-meta">Jeudi · 30 min</div></div>
+        <div class="wo-right"><div class="wo-kcal" style="color:var(--muted);font-size:13px;font-weight:500;">Demain</div><div class="wo-kcal-lbl">~260 kcal</div></div>
+      </div>
+      <div class="workout-item">
+        <div class="wo-icon">🏊‍♀️</div>
+        <div class="wo-body"><div class="wo-name">Natation</div><div class="wo-meta">Vendredi · 45 min</div></div>
+        <div class="wo-right"><div class="wo-kcal" style="color:var(--muted);font-size:13px;font-weight:500;">Vendredi</div><div class="wo-kcal-lbl">~340 kcal</div></div>
+      </div>
+      <button class="btn-primary" onclick="switchTab('coach')"><i class="ti ti-sparkles"></i> Demander un programme à l'IA</button>
+    </div>
+
+
+    <!-- JEUNE -->
+    <div class="tab-panel" id="tab-fast">
+      <div style="margin-bottom:18px;">
+        <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Protocole 16:8</div>
+        <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:700;">Jeûne <span style="color:var(--accent)">intermittent</span></div>
+      </div>
+
+      <div id="fast-status-pill" style="display:flex;justify-content:center;margin-bottom:20px;">
+        <div id="fast-pill" style="border-radius:20px;padding:6px 20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(232,120,90,0.1);border:1px solid rgba(232,120,90,0.3);color:var(--accent);">EN JEÛNE</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:24px;">
+        <div style="position:relative;width:180px;height:180px;">
+          <svg width="180" height="180" style="position:absolute;top:0;left:0;transform:rotate(-90deg);">
+            <circle cx="90" cy="90" r="80" fill="none" stroke="#EDE0D4" stroke-width="8"/>
+            <circle id="fast-circle" cx="90" cy="90" r="80" fill="none" stroke="#E8785A" stroke-width="8" stroke-linecap="round"
+              stroke-dasharray="502" stroke-dashoffset="502" style="transition:stroke-dashoffset 1s linear;"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div id="fast-timer" style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--accent);line-height:1;">00:00</div>
+            <div id="fast-pct" style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px;">0%</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <button id="fast-btn" onclick="toggleFast()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;">Démarrer</button>
+          <button onclick="resetFast()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:16px;font-family:'DM Sans',sans-serif;cursor:pointer;"><i class="ti ti-refresh"></i></button>
+        </div>
+        <div id="fast-info" style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5;"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Ta fenêtre aujourd'hui</div>
+        <div style="display:flex;height:36px;border-radius:8px;overflow:hidden;font-size:11px;font-weight:700;">
+          <div style="flex:11;background:#2a2a2a;display:flex;align-items:center;justify-content:center;color:#888;gap:4px;border-radius:8px 0 0 8px;">🌙 Jeûne · 16h</div>
+          <div style="flex:8;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;gap:4px;">🍽️ Repas · 8h</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);">
+          <span>00:00</span><span id="fast-open" style="color:var(--accent);font-weight:600;">Ouverture 11:00</span><span id="fast-close" style="color:var(--muted);">Fermeture 19:00</span><span>23:59</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Régler ma fenêtre</div>
+        <div style="display:flex;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Ouverture</div>
+            <input type="time" id="fast-start-time" value="11:00" style="width:100%;background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:15px;color:var(--text);outline:none;" onchange="updateFastWindow()">
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Fermeture</div>
+            <input type="time" id="fast-end-time" value="19:00" style="width:100%;background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:15px;color:var(--text);outline:none;" onchange="updateFastWindow()">
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-icon">💡</div>
+        <div>
+          <div class="tip-title">Pendant le jeûne</div>
+          <div class="tip-text">Eau, café noir et thé sont autorisés. Évite tout ce qui contient des calories — même le lait dans le café.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COACH IA -->
+    <div class="tab-panel" id="tab-coach">
+      <div class="coach-intro">
+        <div class="coach-avatar-row">
+          <div class="coach-avatar">🌸</div>
+          <div>
+            <div class="coach-name">Blossom Coach</div>
+            <div class="coach-status"><div class="coach-dot"></div> En ligne — propulsé par Claude</div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-scroll" id="chat-scroll">
+        <div class="msg-row ai">
+          <div class="msg-bubble">Salut Anissa ! 🌸 Je suis ton coach nutrition et bien-être. Tu peux me parler de tes repas, me demander un plan sur mesure, ou juste vider ton sac si tu as envie de craquer. Je suis là !</div>
+        </div>
+      </div>
+      <div class="quick-chips" id="quick-chips">
+        <button class="chip" onclick="sendChip(this)">Génère mon plan repas semaine 🍽️</button>
+        <button class="chip" onclick="sendChip(this)">J'ai envie de craquer ce soir 😩</button>
+        <button class="chip" onclick="sendChip(this)">Mon plateau dure depuis 2 semaines</button>
+        <button class="chip" onclick="sendChip(this)">Que manger avant le sport ?</button>
+        <button class="chip" onclick="sendChip(this)">Calcule mes macros idéales</button>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chat-input" placeholder="Pose ta question à ton coach..." rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()"><i class="ti ti-send"></i></button>
+      </div>
+    </div>
+
+    <!-- PROFIL -->
+    <div class="tab-panel" id="tab-profile">
+      <div class="profile-hdr">
+        <div class="avatar">🌸</div>
+        <div>
+          <div class="profile-name" id="profile-name-display">Anissa</div>
+          <div style="font-size:12px;color:var(--muted);">Membre depuis mars 2025</div>
+          <div class="goal-tag" id="profile-goal-tag">Objectif : –12 kg</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="section-title" style="margin-bottom:4px;">Progression globale</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;" id="profile-prog-text">4.6 kg perdus · 27% de l'objectif atteint</div>
+        <div style="background:var(--soft);border-radius:8px;height:10px;overflow:hidden;">
+          <div style="height:100%;background:var(--accent);border-radius:8px;" id="profile-prog-fill"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);">
+          <span id="p-start">76.6 kg départ</span>
+          <span id="p-current">72 kg actuel</span>
+          <span id="p-goal">60 kg objectif</span>
+        </div>
+      </div>
+      <div class="section-hdr">
+        <div class="section-title">Mes paramètres</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-left">
+          <div class="setting-icon" style="background:#FFF0EB;"><i class="ti ti-flame" style="color:var(--accent);"></i></div>
+          <div class="setting-name">Calories quotidiennes</div>
+        </div>
+        <div class="setting-val" id="disp-kcal">1 500 kcal</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-left">
+          <div class="setting-icon" style="background:#EEF5EE;"><i class="ti ti-run" style="color:var(--green);"></i></div>
+          <div class="setting-name">Objectif de pas</div>
+        </div>
+        <div class="setting-val" id="disp-steps">10 000 / j</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-left">
+          <div class="setting-icon" style="background:#EBF3FF;"><i class="ti ti-droplet" style="color:var(--blue);"></i></div>
+          <div class="setting-name">Hydratation</div>
+        </div>
+        <div class="setting-val" id="disp-water">2.0 L / j</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-left">
+          <div class="setting-icon" style="background:#F3EEFF;"><i class="ti ti-moon" style="color:var(--purple);"></i></div>
+          <div class="setting-name">Objectif sommeil</div>
+        </div>
+        <div class="setting-val" id="disp-sleep">8h / nuit</div>
+      </div>
+      <button class="btn-outline" onclick="openObjectifsModal()" style="margin-top:16px;">
+        <i class="ti ti-edit"></i> Modifier mes objectifs
+      </button>
+    </div>
+
+  </div>
+
+  <div id="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('home')" id="nav-home"><i class="ti ti-home"></i><span>Accueil</span></button>
+    <button class="nav-btn" onclick="switchTab('meals')" id="nav-meals"><i class="ti ti-apple"></i><span>Repas</span></button>
+    <button class="nav-btn" onclick="switchTab('fast')" id="nav-fast"><i class="ti ti-clock"></i><span>Jeûne</span></button>
+    <button class="nav-btn" onclick="switchTab('coach')" id="nav-coach"><i class="ti ti-sparkles"></i><span>Coach IA</span></button>
+    <button class="nav-btn" onclick="switchTab('profile')" id="nav-profile"><i class="ti ti-user"></i><span>Profil</span></button>
+  </div>
+</div>
+
+<!-- WEIGHT MODAL -->
+<div class="modal-overlay hidden" id="weight-modal" onclick="closeModal('weight-modal',event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Mettre à jour ton poids</div>
+    <div class="modal-sub">Entre ton poids du jour pour suivre ta progression.</div>
+    <input class="weight-input-big" type="number" id="weight-input" value="72" step="0.1" min="30" max="200">
+    <div class="modal-unit">kilogrammes</div>
+    <button class="btn-primary" onclick="saveWeight()"><i class="ti ti-check"></i> Enregistrer</button>
+  </div>
+</div>
+
+<!-- OBJECTIFS MODAL -->
+<div class="modal-overlay hidden" id="objectifs-modal" onclick="closeModal('objectifs-modal',event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Mes objectifs</div>
+    <div class="modal-sub">Personnalise ton programme Blossom.</div>
+
+    <div class="obj-field">
+      <div class="obj-label">Prénom</div>
+      <input class="obj-input" type="text" id="obj-name" placeholder="Ton prénom">
+    </div>
+
+    <div class="obj-row">
+      <div class="obj-field">
+        <div class="obj-label">Poids de départ (kg)</div>
+        <input class="obj-input" type="number" id="obj-start" step="0.1" placeholder="ex: 76.6">
+      </div>
+      <div class="obj-field">
+        <div class="obj-label">Poids objectif (kg)</div>
+        <input class="obj-input" type="number" id="obj-goal" step="0.1" placeholder="ex: 60">
+      </div>
+    </div>
+
+    <div class="obj-field">
+      <div class="obj-label">Calories quotidiennes (kcal)</div>
+      <input class="obj-input" type="number" id="obj-kcal" placeholder="ex: 1500">
+    </div>
+
+    <div class="obj-row">
+      <div class="obj-field">
+        <div class="obj-label">Objectif eau (L)</div>
+        <input class="obj-input" type="number" id="obj-water" step="0.1" placeholder="ex: 2.0">
+      </div>
+      <div class="obj-field">
+        <div class="obj-label">Objectif sommeil (h)</div>
+        <input class="obj-input" type="number" id="obj-sleep" placeholder="ex: 8">
+      </div>
+    </div>
+
+    <div class="obj-field">
+      <div class="obj-label">Objectif de pas / jour</div>
+      <input class="obj-input" type="number" id="obj-steps" placeholder="ex: 10000">
+    </div>
+
+    <button class="btn-primary" onclick="saveObjectifs()"><i class="ti ti-check"></i> Enregistrer</button>
+    <button class="btn-outline" onclick="closeModal('objectifs-modal',{target:{id:'objectifs-modal'}})">Annuler</button>
+  </div>
+</div>
+
+<script>
+const API_KEY = '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';
+const MODEL = 'claude-sonnet-4-20250514';
+
+let settings = {
+  name: localStorage.getItem('b_name') || 'Anissa',
+  startWeight: parseFloat(localStorage.getItem('b_start') || '76.6'),
+  goalWeight: parseFloat(localStorage.getItem('b_goal') || '60'),
+  kcal: parseInt(localStorage.getItem('b_kcal') || '1500'),
+  water: parseFloat(localStorage.getItem('b_water') || '2.0'),
+  sleep: parseInt(localStorage.getItem('b_sleep') || '8'),
+  steps: parseInt(localStorage.getItem('b_steps') || '10000'),
+};
+let currentWeight = parseFloat(localStorage.getItem('b_weight') || '72');
+let hydroCount = parseInt(localStorage.getItem('b_hydro') || '5');
+let chatHistory = [];
+
+const SYSTEM_PROMPT = () => `Tu es Blossom Coach, un coach nutrition et bien-être bienveillant, chaleureux et motivant.
+Tu aides ${settings.name} à atteindre son objectif de perte de poids (de ${currentWeight} kg à ${settings.goalWeight} kg).
+Son budget calorique est de ${settings.kcal} kcal/jour.
+Elle fait du sport 5 fois par semaine (yoga, renfo, cardio, HIIT vélo, natation).
+Tu réponds en français, de façon naturelle et humaine — jamais robotique.
+Tu es encourageant sans être condescendant. Tu donnes des conseils concrets et actionnables.
+Tu t'adaptes à son humeur : si elle a envie de craquer, tu l'écoutes avant de conseiller.
+Tes réponses sont courtes et lisibles sur mobile (max 4-5 phrases sauf si elle demande un plan détaillé).`;
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateDate();
+  buildWeightChart();
+  buildHydro();
+  updateAll();
+  loadSleep();
+});
+
+function updateDate() {
+  const now = new Date();
+  document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long'});
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  const nb = document.getElementById('nav-' + id);
+  if (nb) nb.classList.add('active');
+  if (id === 'coach') setTimeout(() => { const s = document.getElementById('chat-scroll'); s.scrollTop = s.scrollHeight; }, 100);
+}
+
+function buildWeightChart() {
+  const weights = [settings.startWeight - 2.4, settings.startWeight - 2.8, settings.startWeight - 3.1, settings.startWeight - 3.5, settings.startWeight - 3.7, settings.startWeight - 4.1, currentWeight];
+  const days = ['L','M','M','J','V','S','D'];
+  const chart = document.getElementById('weight-chart');
+  chart.innerHTML = '';
+  const mn = Math.min(...weights), mx = Math.max(...weights), range = mx - mn || 1;
+  weights.forEach((w, i) => {
+    const col = document.createElement('div'); col.className = 'bar-col';
+    const bar = document.createElement('div'); bar.className = 'bar-rect';
+    bar.style.height = Math.round(20 + ((w - mn) / range) * 40) + 'px';
+    bar.style.background = i === weights.length - 1 ? 'var(--accent)' : 'var(--soft)';
+    bar.style.border = i === weights.length - 1 ? 'none' : '1px solid var(--border)';
+    const d = document.createElement('div'); d.className = 'bar-day'; d.textContent = days[i];
+    col.appendChild(bar); col.appendChild(d); chart.appendChild(col);
+  });
+}
+
+function buildHydro() {
+  const row = document.getElementById('hydro-dots'); row.innerHTML = '';
+  for (let i = 0; i < 8; i++) {
+    const d = document.createElement('div');
+    d.className = 'water-glass' + (i < hydroCount ? ' filled' : '');
+    d.innerHTML = '<i class="ti ti-droplet" style="color:' + (i < hydroCount ? 'var(--blue)' : 'var(--border)') + ';font-size:16px;"></i>';
+    d.onclick = () => { hydroCount = i < hydroCount ? i : i + 1; localStorage.setItem('b_hydro', hydroCount); buildHydro(); updateHydroCount(); };
+    row.appendChild(d);
+  }
+  updateHydroCount();
+}
+function updateHydroCount() { document.getElementById('hydro-count').textContent = hydroCount + ' / 8 verres'; }
+
+function calcSleep() {
+  const start = document.getElementById('sleep-start').value;
+  const end = document.getElementById('sleep-end').value;
+  if (!start || !end) return;
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  let startMins = sh * 60 + sm;
+  let endMins = eh * 60 + em;
+  if (endMins <= startMins) endMins += 24 * 60;
+  const totalMins = endMins - startMins;
+  const hours = Math.floor(totalMins / 60);
+  const mins = totalMins % 60;
+  const label = hours + 'h' + (mins > 0 ? mins : '');
+  document.getElementById('sleep-display').textContent = label + ' cette nuit';
+  document.getElementById('sleep-total-label').textContent = label;
+  const pct = Math.min(100, Math.round((totalMins / (settings.sleep * 60)) * 100));
+  document.getElementById('sleep-bar').style.width = pct + '%';
+  document.getElementById('sleep-bar').style.background = pct >= 100 ? 'var(--green)' : pct >= 75 ? 'var(--purple)' : 'var(--accent)';
+  // Update stat card
+  const statVal = document.querySelector('#tab-home .stat-val[style*="purple"]');
+  if (statVal) statVal.textContent = label;
+  localStorage.setItem('b_sleep_start', start);
+  localStorage.setItem('b_sleep_end', end);
+}
+
+function loadSleep() {
+  const start = localStorage.getItem('b_sleep_start');
+  const end = localStorage.getItem('b_sleep_end');
+  if (start) document.getElementById('sleep-start').value = start;
+  if (end) document.getElementById('sleep-end').value = end;
+  if (start && end) calcSleep();
+}
+
+function updateAll() {
+  const lost = settings.startWeight - currentWeight;
+  const remaining = currentWeight - settings.goalWeight;
+  const total = settings.startWeight - settings.goalWeight;
+  const prog = Math.max(0, Math.min(100, (lost / total) * 100));
+
+  document.getElementById('current-weight').textContent = currentWeight.toFixed(1).replace('.0','');
+  document.getElementById('goal-target-display').textContent = settings.goalWeight + ' kg';
+  document.getElementById('lost-label').textContent = '–' + Math.abs(lost).toFixed(1) + ' kg perdus';
+  document.getElementById('remaining-label').textContent = '–' + Math.abs(remaining).toFixed(1) + ' kg restants';
+  document.getElementById('prog-fill').style.width = Math.round(prog) + '%';
+  document.getElementById('home-name').textContent = settings.name + ' 🌸';
+
+  document.getElementById('kcal-sub').textContent = '/ ' + settings.kcal + ' kcal';
+  document.getElementById('water-sub').textContent = '/ ' + settings.water + ' L objectif';
+  document.getElementById('steps-sub').textContent = '/ ' + settings.steps.toLocaleString('fr-FR');
+  document.getElementById('sleep-sub').textContent = '/ ' + settings.sleep + 'h objectif';
+
+  document.getElementById('profile-name-display').textContent = settings.name;
+  document.getElementById('profile-goal-tag').textContent = 'Objectif : –' + Math.abs(remaining).toFixed(0) + ' kg';
+  document.getElementById('profile-prog-text').textContent = Math.abs(lost).toFixed(1) + ' kg perdus · ' + Math.round(prog) + '% de l\'objectif atteint';
+  document.getElementById('profile-prog-fill').style.width = Math.round(prog) + '%';
+  document.getElementById('p-start').textContent = settings.startWeight + ' kg départ';
+  document.getElementById('p-current').textContent = currentWeight + ' kg actuel';
+  document.getElementById('p-goal').textContent = settings.goalWeight + ' kg objectif';
+
+  document.getElementById('disp-kcal').textContent = settings.kcal.toLocaleString('fr-FR') + ' kcal';
+  document.getElementById('disp-steps').textContent = settings.steps.toLocaleString('fr-FR') + ' / j';
+  document.getElementById('disp-water').textContent = settings.water + ' L / j';
+  document.getElementById('disp-sleep').textContent = settings.sleep + 'h / nuit';
+  document.getElementById('sleep-goal-label').textContent = 'objectif ' + settings.sleep + 'h';
+  calcSleep();
+}
+
+function openWeightModal() {
+  document.getElementById('weight-input').value = currentWeight;
+  document.getElementById('weight-modal').classList.remove('hidden');
+}
+function closeModal(id, e) {
+  if (e.target.id === id) document.getElementById(id).classList.add('hidden');
+}
+function saveWeight() {
+  const val = parseFloat(document.getElementById('weight-input').value);
+  if (val > 20 && val < 300) {
+    currentWeight = val;
+    localStorage.setItem('b_weight', currentWeight);
+    updateAll(); buildWeightChart();
+    document.getElementById('weight-modal').classList.add('hidden');
+  }
+}
+
+function openObjectifsModal() {
+  document.getElementById('obj-name').value = settings.name;
+  document.getElementById('obj-start').value = settings.startWeight;
+  document.getElementById('obj-goal').value = settings.goalWeight;
+  document.getElementById('obj-kcal').value = settings.kcal;
+  document.getElementById('obj-water').value = settings.water;
+  document.getElementById('obj-sleep').value = settings.sleep;
+  document.getElementById('obj-steps').value = settings.steps;
+  document.getElementById('objectifs-modal').classList.remove('hidden');
+}
+function saveObjectifs() {
+  const name = document.getElementById('obj-name').value.trim();
+  const start = parseFloat(document.getElementById('obj-start').value);
+  const goal = parseFloat(document.getElementById('obj-goal').value);
+  const kcal = parseInt(document.getElementById('obj-kcal').value);
+  const water = parseFloat(document.getElementById('obj-water').value);
+  const sleep = parseInt(document.getElementById('obj-sleep').value);
+  const steps = parseInt(document.getElementById('obj-steps').value);
+  if (name) { settings.name = name; localStorage.setItem('b_name', name); }
+  if (start > 0) { settings.startWeight = start; localStorage.setItem('b_start', start); }
+  if (goal > 0) { settings.goalWeight = goal; localStorage.setItem('b_goal', goal); }
+  if (kcal > 0) { settings.kcal = kcal; localStorage.setItem('b_kcal', kcal); }
+  if (water > 0) { settings.water = water; localStorage.setItem('b_water', water); }
+  if (sleep > 0) { settings.sleep = sleep; localStorage.setItem('b_sleep', sleep); }
+  if (steps > 0) { settings.steps = steps; localStorage.setItem('b_steps', steps); }
+  updateAll();
+  document.getElementById('objectifs-modal').classList.add('hidden');
+}
+
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function sendChip(btn) {
+  const text = btn.textContent.replace(/[🍽️😩]/g,'').trim();
+  document.getElementById('chat-input').value = text;
+  document.getElementById('quick-chips').style.display = 'none';
+  sendMessage();
+}
+function addMessage(role, text) {
+  const scroll = document.getElementById('chat-scroll');
+  const row = document.createElement('div'); row.className = 'msg-row ' + (role === 'user' ? 'user' : 'ai');
+  const bubble = document.createElement('div'); bubble.className = 'msg-bubble'; bubble.textContent = text;
+  row.appendChild(bubble); scroll.appendChild(row); scroll.scrollTop = scroll.scrollHeight;
+}
+function showTyping() {
+  const scroll = document.getElementById('chat-scroll');
+  const row = document.createElement('div'); row.className = 'msg-row ai'; row.id = 'typing-row';
+  const bubble = document.createElement('div'); bubble.className = 'msg-bubble';
+  bubble.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  row.appendChild(bubble); scroll.appendChild(row); scroll.scrollTop = scroll.scrollHeight;
+}
+function removeTyping() { const t = document.getElementById('typing-row'); if (t) t.remove(); }
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+  document.getElementById('send-btn').disabled = true;
+  chatHistory.push({ role: 'user', content: text });
+  addMessage('user', text);
+  showTyping();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: MODEL, max_tokens: 1024, system: SYSTEM_PROMPT(), messages: chatHistory })
+    });
+    const data = await res.json();
+    removeTyping();
+    if (data.content && data.content[0]) {
+      const reply = data.content[0].text;
+      chatHistory.push({ role: 'assistant', content: reply });
+      addMessage('ai', reply);
+    } else { addMessage('ai', 'Oups, une erreur s\'est produite. Vérifie ta clé API et réessaie.'); }
+  } catch (err) {
+    removeTyping();
+    addMessage('ai', 'Impossible de me connecter. Vérifie ta connexion internet.');
+  }
+  document.getElementById('send-btn').disabled = false;
+}
+
+// ===== JEUNE INTERMITTENT =====
+let fastInterval = null;
+let fastRunning = false;
+let fastStartTime = null;
+
+function getFastWindow() {
+  const startStr = document.getElementById('fast-start-time').value || '11:00';
+  const endStr = document.getElementById('fast-end-time').value || '19:00';
+  const [sh, sm] = startStr.split(':').map(Number);
+  const [eh, em] = endStr.split(':').map(Number);
+  return { startH: sh, startM: sm, endH: eh, endM: em };
+}
+
+function updateFastWindow() {
+  const w = getFastWindow();
+  document.getElementById('fast-open').textContent = 'Ouverture ' + String(w.startH).padStart(2,'0') + ':' + String(w.startM).padStart(2,'0');
+  document.getElementById('fast-close').textContent = 'Fermeture ' + String(w.endH).padStart(2,'0') + ':' + String(w.endM).padStart(2,'0');
+  updateFastStatus();
+}
+
+function updateFastStatus() {
+  const now = new Date();
+  const w = getFastWindow();
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+  const startMins = w.startH * 60 + w.startM;
+  const endMins = w.endH * 60 + w.endM;
+  const isEating = nowMins >= startMins && nowMins < endMins;
+  const pill = document.getElementById('fast-pill');
+  const circle = document.getElementById('fast-circle');
+
+  if (isEating) {
+    pill.textContent = '🍽️ FENÊTRE REPAS';
+    pill.style.background = 'rgba(107,158,110,0.1)';
+    pill.style.borderColor = 'rgba(107,158,110,0.3)';
+    pill.style.color = 'var(--green)';
+    circle.style.stroke = 'var(--green)';
+    const elapsed = nowMins - startMins;
+    const total = endMins - startMins;
+    const pct = Math.round((elapsed / total) * 100);
+    const offset = 502 - (502 * pct / 100);
+    circle.style.strokeDashoffset = offset;
+    document.getElementById('fast-pct').textContent = pct + '%';
+    const rem = total - elapsed;
+    const rh = Math.floor(rem / 60), rm = rem % 60;
+    document.getElementById('fast-timer').textContent = String(rh).padStart(2,'0') + ':' + String(rm).padStart(2,'0');
+    document.getElementById('fast-info').textContent = 'Fermeture dans ' + rh + 'h' + (rm > 0 ? rm + 'min' : '');
+  } else {
+    pill.textContent = '🌙 EN JEÛNE';
+    pill.style.background = 'rgba(232,120,90,0.1)';
+    pill.style.borderColor = 'rgba(232,120,90,0.3)';
+    pill.style.color = 'var(--accent)';
+    circle.style.stroke = 'var(--accent)';
+    let minsUntilOpen;
+    if (nowMins < startMins) {
+      minsUntilOpen = startMins - nowMins;
+    } else {
+      minsUntilOpen = (24 * 60 - nowMins) + startMins;
+    }
+    const fastTotal = 16 * 60;
+    const fastElapsed = fastTotal - minsUntilOpen;
+    const pct = Math.max(0, Math.round((fastElapsed / fastTotal) * 100));
+    const offset = 502 - (502 * pct / 100);
+    circle.style.strokeDashoffset = offset;
+    document.getElementById('fast-pct').textContent = pct + '%';
+    const uh = Math.floor(minsUntilOpen / 60), um = minsUntilOpen % 60;
+    document.getElementById('fast-timer').textContent = String(uh).padStart(2,'0') + ':' + String(um).padStart(2,'0');
+    document.getElementById('fast-info').textContent = 'Ouverture dans ' + uh + 'h' + (um > 0 ? um + 'min' : '');
+  }
+}
+
+function toggleFast() {
+  fastRunning = !fastRunning;
+  const btn = document.getElementById('fast-btn');
+  if (fastRunning) {
+    btn.textContent = 'Pause';
+    btn.style.background = 'rgba(196,149,106,0.15)';
+    btn.style.color = 'var(--accent2)';
+    btn.style.border = '1px solid var(--accent2)';
+    fastInterval = setInterval(updateFastStatus, 60000);
+    updateFastStatus();
+  } else {
+    btn.textContent = 'Reprendre';
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#fff';
+    btn.style.border = 'none';
+    clearInterval(fastInterval);
+  }
+}
+
+function resetFast() {
+  fastRunning = false;
+  clearInterval(fastInterval);
+  const btn = document.getElementById('fast-btn');
+  btn.textContent = 'Démarrer';
+  btn.style.background = 'var(--accent)';
+  btn.style.color = '#fff';
+  btn.style.border = 'none';
+  document.getElementById('fast-timer').textContent = '00:00';
+  document.getElementById('fast-pct').textContent = '0%';
+  document.getElementById('fast-circle').style.strokeDashoffset = '502';
+  document.getElementById('fast-info').textContent = '';
+}
+
+// Auto-update fasting status every minute
+setInterval(() => { if (fastRunning) updateFastStatus(); }, 60000);
+
+</script>
+</body>
+</html>
